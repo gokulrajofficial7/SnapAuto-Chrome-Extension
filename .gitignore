@@ -1,0 +1,48 @@
+# Operating System Files
+.DS_Store
+Thumbs.db
+desktop.ini
+*.lnk
+
+# Editor & IDE Directories
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+*.swp
+*.swo
+*~
+
+# Temporary, Scratch & Log Files
+*.log
+*.tmp
+*.temp
+*.bak
+test.txt
+scratch/
+
+# Credentials, Environment & Private Data
+.env
+.env.*
+*.pem
+*.key
+*.token
+*.auth
+tokens.json
+credentials.json
+
+# Browser Profiles, Cookies & Session Data
+profiles/
+User Data/
+cookies.txt
+session.json
+*.session
+snapchat_cookies*
+localStorage/
+
+# Build & Extension Packaging
+*.crx
+*.zip
+dist/
+build/
+node_modules/

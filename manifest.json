@@ -1,0 +1,36 @@
+{
+  "manifest_version": 3,
+  "name": "SnapAuto - Snapchat Web Chrome Extension",
+  "version": "2.5.0",
+  "description": "A Chrome Manifest V3 extension project featuring a compact dashboard, activity monitoring, session statistics, and browser-based controls.",
+  "permissions": [
+    "storage"
+  ],
+  "host_permissions": [
+    "https://web.snapchat.com/*",
+    "https://*.snapchat.com/*"
+  ],
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_icon": "icons/icon.svg",
+    "default_title": "SnapAuto Controls"
+  },
+  "icons": {
+    "128": "icons/icon.svg"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://web.snapchat.com/*",
+        "https://*.snapchat.com/web*"
+      ],
+      "js": [
+        "content/content.js"
+      ],
+      "css": [
+        "content/content.css"
+      ],
+      "run_at": "document_idle"
+    }
+  ]
+}

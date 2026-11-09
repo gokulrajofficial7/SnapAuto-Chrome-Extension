@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SnapAuto Controls</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header class="header">
+      <div class="brand">
+        <div class="logo-box">
+          <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        </div>
+        <div>
+          <h1 class="title">SnapAuto</h1>
+          <span class="subtitle">Snapchat Web Activity Monitor</span>
+        </div>
+      </div>
+      <span class="badge" id="versionBadge">v2.5.0</span>
+    </header>
+
+    <!-- Master Switch Card -->
+    <div class="card master-card">
+      <div class="master-info">
+        <div class="master-title">Activity Monitor</div>
+        <div class="master-desc" id="statusDescription">Currently Paused</div>
+      </div>
+      <label class="switch">
+        <input type="checkbox" id="masterToggle">
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <!-- Mode Selector -->
+    <div class="section-title">Monitoring Mode</div>
+    <div class="mode-selector">
+      <label class="mode-option">
+        <input type="radio" name="autoMode" value="all_chats" id="modeAllChats" checked>
+        <div class="mode-card">
+          <div class="mode-icon">👥</div>
+          <div class="mode-details">
+            <div class="mode-name">All Friends (Feed Monitor)</div>
+            <div class="mode-sub">Monitors and tracks status across friend feed</div>
+          </div>
+        </div>
+      </label>
+
+      <label class="mode-option">
+        <input type="radio" name="autoMode" value="active_chat" id="modeActiveChat">
+        <div class="mode-card">
+          <div class="mode-icon">💬</div>
+          <div class="mode-details">
+            <div class="mode-name">Active Chat Only</div>
+            <div class="mode-sub">Monitors activity in current active chat</div>
+          </div>
+        </div>
+      </label>
+    </div>
+
+    <!-- Timing & Speed Settings -->
+    <div class="section-title">Interval & Pacing</div>
+    <div class="card settings-card">
+      <div class="setting-row">
+        <div class="setting-label">
+          <span>Check Interval</span>
+          <span class="setting-value" id="viewDurationVal">2.0s</span>
+        </div>
+        <input type="range" id="viewDurationSlider" min="1000" max="6000" step="500" value="2000">
+        <div class="slider-marks">
+          <span>1.0s (Fast)</span>
+          <span>2.0s (Balanced)</span>
+          <span>6.0s (Relaxed)</span>
+        </div>
+      </div>
+
+      <div class="setting-row" style="margin-top: 14px;">
+        <div class="setting-label">
+          <span>Delay Between Checks</span>
+          <span class="setting-value" id="chatDelayVal">1.2s</span>
+        </div>
+        <input type="range" id="chatDelaySlider" min="1000" max="5000" step="200" value="1200">
+        <div class="slider-marks">
+          <span>1.0s</span>
+          <span>1.8s</span>
+          <span>5.0s</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pacing & Safeguards -->
+    <div class="section-title">Display & Controls</div>
+    <div class="card settings-card">
+      <div class="toggle-row">
+        <div class="toggle-info">
+          <div class="toggle-name">Safe Pacing Cooldown</div>
+          <div class="toggle-desc">Applies polite pauses to avoid browser UI lag</div>
+        </div>
+        <label class="switch switch-sm">
+          <input type="checkbox" id="cooldownToggle" checked>
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <div class="toggle-row">
+        <div class="toggle-info">
+          <div class="toggle-name">Auto-Scroll Conversation Feed</div>
+          <div class="toggle-desc">Scrolls sidebar feed to monitor unread indicators</div>
+        </div>
+        <label class="switch switch-sm">
+          <input type="checkbox" id="autoScrollToggle" checked>
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <div class="toggle-row">
+        <div class="toggle-info">
+          <div class="toggle-name">Floating On-Screen HUD</div>
+          <div class="toggle-desc">Show interactive control widget directly on Snapchat</div>
+        </div>
+        <label class="switch switch-sm">
+          <input type="checkbox" id="hudVisibleToggle" checked>
+          <span class="slider"></span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Statistics -->
+    <div class="section-title">Session Statistics</div>
+    <div class="stats-grid">
+      <div class="stat-box">
+        <div class="stat-num" id="statSession">0</div>
+        <div class="stat-text">Session Events</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num" id="statTotal">0</div>
+        <div class="stat-text">Total Monitored</div>
+      </div>
+    </div>
+
+    <div class="actions-row">
+      <button class="btn-secondary" id="btnResetStats">Reset Stats</button>
+      <a href="https://web.snapchat.com" target="_blank" class="btn-primary" id="btnOpenSnapchat">Open Snapchat Web ↗</a>
+    </div>
+
+    <!-- Safety Footer -->
+    <footer class="footer">
+      💡 <b>Independent Project:</b> SnapAuto is an open-source educational Chrome extension for Snapchat Web.
+    </footer>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

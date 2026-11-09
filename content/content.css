@@ -1,0 +1,318 @@
+/* SnapAuto Floating HUD & Overlay Styles */
+
+:root {
+  --snap-yellow: #fffc00;
+  --snap-yellow-hover: #faea00;
+  --snap-red: #e92754;
+  --snap-purple: #9b5de5;
+  --snap-bg-dark: #121214;
+  --snap-panel-bg: rgba(22, 23, 27, 0.94);
+  --snap-border: rgba(255, 255, 255, 0.12);
+  --snap-text-primary: #ffffff;
+  --snap-text-muted: #a0a0a8;
+  --snap-green: #00e676;
+  --snap-orange: #ff9100;
+  --snap-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 1px rgba(255, 255, 255, 0.2);
+}
+
+/* Floating HUD Main Container */
+#snapauto-hud {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 9999999;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  box-sizing: border-box;
+  user-select: none;
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--snap-text-primary);
+  display: flex;
+  flex-direction: column;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+#snapauto-hud * {
+  box-sizing: border-box;
+}
+
+/* Minimized Pill View */
+#snapauto-hud.minimized .snapauto-panel {
+  display: none !important;
+}
+
+#snapauto-hud.minimized .snapauto-pill {
+  display: flex !important;
+}
+
+.snapauto-pill {
+  display: none;
+  align-items: center;
+  gap: 8px;
+  background: var(--snap-panel-bg);
+  backdrop-filter: blur(14px);
+  border: 1px solid var(--snap-border);
+  padding: 8px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  box-shadow: var(--snap-shadow);
+  font-weight: 600;
+  color: var(--snap-yellow);
+}
+
+.snapauto-pill:hover {
+  background: rgba(35, 36, 42, 0.98);
+  border-color: var(--snap-yellow);
+}
+
+/* Expanded Panel */
+.snapauto-panel {
+  width: 320px;
+  background: var(--snap-panel-bg);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--snap-border);
+  border-radius: 18px;
+  box-shadow: var(--snap-shadow);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header */
+.snapauto-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  background: rgba(255, 255, 255, 0.03);
+  border-bottom: 1px solid var(--snap-border);
+  cursor: grab;
+}
+
+.snapauto-header:active {
+  cursor: grabbing;
+}
+
+.snapauto-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: -0.2px;
+}
+
+.snapauto-logo-icon {
+  width: 20px;
+  height: 20px;
+  background: var(--snap-yellow);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.snapauto-logo-icon svg {
+  width: 12px;
+  height: 12px;
+  fill: #000000;
+}
+
+.snapauto-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.snapauto-btn-icon {
+  background: transparent;
+  border: none;
+  color: var(--snap-text-muted);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.snapauto-btn-icon:hover {
+  color: var(--snap-text-primary);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* Status Banner */
+.snapauto-status-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 14px;
+  background: rgba(0, 0, 0, 0.25);
+  font-size: 12px;
+}
+
+.snapauto-status-indicator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 500;
+}
+
+.snapauto-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #757575;
+  transition: background 0.2s ease;
+}
+
+.snapauto-dot.running {
+  background: var(--snap-green);
+  box-shadow: 0 0 8px rgba(0, 230, 118, 0.6);
+}
+
+.snapauto-dot.cooldown {
+  background: var(--snap-orange);
+  box-shadow: 0 0 8px rgba(255, 145, 0, 0.6);
+}
+
+.snapauto-dot.paused {
+  background: #757575;
+}
+
+/* Stats Counter Row */
+.snapauto-stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  padding: 10px 14px;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.snapauto-stat-card {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  padding: 8px 10px;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.snapauto-stat-value {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--snap-yellow);
+  line-height: 1.2;
+}
+
+.snapauto-stat-label {
+  font-size: 10px;
+  color: var(--snap-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 2px;
+}
+
+/* Primary Action Button */
+.snapauto-action-row {
+  padding: 8px 14px;
+}
+
+.snapauto-btn-main {
+  width: 100%;
+  padding: 10px 16px;
+  border-radius: 12px;
+  border: none;
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  background: var(--snap-yellow);
+  color: #000000;
+}
+
+.snapauto-btn-main:hover {
+  background: var(--snap-yellow-hover);
+  transform: translateY(-1px);
+}
+
+.snapauto-btn-main:active {
+  transform: translateY(1px);
+}
+
+.snapauto-btn-main.is-active {
+  background: #ff3b30;
+  color: #ffffff;
+}
+
+/* Speed / Profile Buttons */
+.snapauto-presets {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 14px 10px;
+}
+
+.snapauto-preset-btn {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--snap-text-muted);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 6px 4px;
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.15s ease;
+}
+
+.snapauto-preset-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--snap-text-primary);
+}
+
+.snapauto-preset-btn.active {
+  background: rgba(255, 252, 0, 0.15);
+  border-color: var(--snap-yellow);
+  color: var(--snap-yellow);
+}
+
+/* Activity Log Ticker */
+.snapauto-log-box {
+  background: rgba(0, 0, 0, 0.35);
+  border-top: 1px solid var(--snap-border);
+  padding: 8px 12px;
+  max-height: 85px;
+  overflow-y: auto;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 10.5px;
+  color: #d1d1d6;
+  scrollbar-width: thin;
+}
+
+.snapauto-log-entry {
+  margin-bottom: 4px;
+  line-height: 1.3;
+  word-break: break-all;
+}
+
+.snapauto-log-entry:last-child {
+  margin-bottom: 0;
+}
+
+.snapauto-log-time {
+  color: var(--snap-text-muted);
+  margin-right: 4px;
+}
+
+/* Highlight border on detected elements during interaction */
+.snapauto-target-highlight {
+  outline: 2px solid var(--snap-yellow) !important;
+  outline-offset: 2px !important;
+  transition: outline 0.2s ease !important;
+}
