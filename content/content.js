@@ -1185,6 +1185,15 @@
     state.currentSnapCount++;
     state.stats.sessionOpened++;
     state.stats.totalOpened++;
+
+    try {
+      localStorage.setItem('snapauto_total_opened', String(state.stats.totalOpened));
+    } catch (e) {}
+
+    if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
+      chrome.storage.local.set({ snapauto_total_opened: state.stats.totalOpened });
+    }
+
     saveSettingsToStorage();
     renderUI();
   }
@@ -1211,6 +1220,13 @@
 
   // --- Storage Synchronization ---
   function saveSettingsToStorage() {
+    let localTotal = 0;
+    try {
+      localTotal = Number(localStorage.getItem('snapauto_total_opened')) || 0;
+    } catch (e) {}
+    const safeTotal = Math.max(state.stats.totalOpened || 0, localTotal);
+    state.stats.totalOpened = safeTotal;
+
     const payload = {
       enabled: state.enabled,
       mode: state.mode,
@@ -1224,7 +1240,12 @@
       hudVisible: state.hudVisible,
       hudMinimized: state.hudMinimized,
       speedPreset: state.speedPreset,
-      stats: state.stats
+      stats: {
+        sessionOpened: state.stats.sessionOpened,
+        totalOpened: safeTotal,
+        chatsScanned: state.stats.chatsScanned,
+        lastReset: state.stats.lastReset
+      }
     };
 
     if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
@@ -1236,35 +1257,50 @@
   }
 
   function loadSettingsFromStorage() {
+    let localTotal = 0;
+    try {
+      localTotal = Number(localStorage.getItem('snapauto_total_opened')) || 0;
+    } catch (e) {}
+
     if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
-      chrome.storage.local.get(['snapauto_settings'], (result) => {
-        if (result && result.snapauto_settings) {
-          const s = result.snapauto_settings;
-          state = {
-            ...state,
-            ...s,
-            stats: { ...state.stats, ...(s.stats || {}) }
-          };
-          renderUI();
-          if (state.enabled && !state.isRunning) {
-            startLoop();
+      chrome.storage.local.get(['snapauto_settings', 'snapauto_total_opened'], (result) => {
+        const s = (result && result.snapauto_settings) || {};
+        const chromeTotal = Number(result && result.snapauto_total_opened) || (s.stats && Number(s.stats.totalOpened)) || 0;
+        const highestTotal = Math.max(chromeTotal, localTotal, state.stats.totalOpened || 0);
+
+        state = {
+          ...state,
+          ...s,
+          stats: {
+            sessionOpened: 0, // In-memory session snaps strictly resets to 0 on every launch/reload
+            totalOpened: highestTotal, // All-time persistent total snaps NEVER resets to 0
+            chatsScanned: 0,
+            lastReset: (s.stats && s.stats.lastReset) || new Date().toISOString()
           }
+        };
+        renderUI();
+        if (state.enabled && !state.isRunning) {
+          startLoop();
         }
       });
     } else {
       try {
         const raw = localStorage.getItem('snapauto_settings');
-        if (raw) {
-          const s = JSON.parse(raw);
-          state = {
-            ...state,
-            ...s,
-            stats: { ...state.stats, ...(s.stats || {}) }
-          };
-          renderUI();
-          if (state.enabled && !state.isRunning) {
-            startLoop();
+        const s = raw ? JSON.parse(raw) : {};
+        const highestTotal = Math.max(localTotal, (s.stats && Number(s.stats.totalOpened)) || 0, state.stats.totalOpened || 0);
+        state = {
+          ...state,
+          ...s,
+          stats: {
+            sessionOpened: 0,
+            totalOpened: highestTotal,
+            chatsScanned: 0,
+            lastReset: (s.stats && s.stats.lastReset) || new Date().toISOString()
           }
+        };
+        renderUI();
+        if (state.enabled && !state.isRunning) {
+          startLoop();
         }
       } catch (e) {}
     }
@@ -1272,13 +1308,26 @@
 
   if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.onChanged) {
     chrome.storage.onChanged.addListener((changes, namespace) => {
-      if (namespace === 'local' && changes.snapauto_settings) {
-        const newVal = changes.snapauto_settings.newValue;
-        if (newVal) {
+      if (namespace === 'local') {
+        let incomingTotal = state.stats.totalOpened;
+        if (changes.snapauto_total_opened && typeof changes.snapauto_total_opened.newValue === 'number') {
+          incomingTotal = Math.max(incomingTotal, changes.snapauto_total_opened.newValue);
+        }
+        if (changes.snapauto_settings && changes.snapauto_settings.newValue) {
+          const newVal = changes.snapauto_settings.newValue;
+          if (newVal.stats && typeof newVal.stats.totalOpened === 'number') {
+            incomingTotal = Math.max(incomingTotal, newVal.stats.totalOpened);
+          }
+          const currentSessionCount = state.stats.sessionOpened;
           state = {
             ...state,
             ...newVal,
-            stats: { ...state.stats, ...(newVal.stats || {}) }
+            stats: {
+              sessionOpened: currentSessionCount, // Keep the active session count
+              totalOpened: incomingTotal,         // Never let totalOpened be wiped
+              chatsScanned: state.stats.chatsScanned,
+              lastReset: (newVal.stats && newVal.stats.lastReset) || state.stats.lastReset
+            }
           };
           renderUI();
           if (newVal.enabled && !state.isRunning) {
@@ -1606,7 +1655,7 @@
 
         <div class="snapauto-action-row">
           <button class="snapauto-btn-main ${state.enabled ? 'is-active' : ''}" id="snapauto-btn-toggle">
-            ${state.enabled ? '⏸ Pause Monitor' : '▶ Start Monitor'}
+            ${state.enabled ? '⏸ Pause Auto-Opener' : '▶ Start Auto-Opener'}
           </button>
         </div>
 
@@ -1659,6 +1708,32 @@
         applySpeedPreset(preset);
       });
     });
+
+    const totalEl = hud.querySelector('#snapauto-stat-total');
+    if (totalEl) {
+      const totalCard = totalEl.closest('.snapauto-stat-card') || totalEl;
+      totalCard.style.cursor = 'pointer';
+      totalCard.title = 'Click to edit all-time Total Opened count';
+      totalCard.addEventListener('click', () => {
+        const current = state.stats.totalOpened || 0;
+        const input = prompt('Enter your all-time Total Opened snaps count:', current);
+        if (input !== null) {
+          const val = parseInt(input.trim(), 10);
+          if (!isNaN(val) && val >= 0) {
+            state.stats.totalOpened = val;
+            try {
+              localStorage.setItem('snapauto_total_opened', String(val));
+            } catch (e) {}
+            if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
+              chrome.storage.local.set({ snapauto_total_opened: val });
+            }
+            saveSettingsToStorage();
+            renderUI();
+            addLog(`Total Opened set to ${val}`);
+          }
+        }
+      });
+    }
 
     makeDraggable(hud, hud.querySelector('#snapauto-header'));
   }
@@ -1718,7 +1793,7 @@
     const toggleBtn = state.hudEl.querySelector('#snapauto-btn-toggle');
     if (toggleBtn) {
       toggleBtn.className = `snapauto-btn-main ${state.enabled ? 'is-active' : ''}`;
-      toggleBtn.textContent = state.enabled ? '⏸ Pause Monitor' : '▶ Start Monitor';
+      toggleBtn.textContent = state.enabled ? '⏸ Pause Auto-Opener' : '▶ Start Auto-Opener';
     }
 
     const sessionEl = state.hudEl.querySelector('#snapauto-stat-session');

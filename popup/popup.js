@@ -100,7 +100,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function saveSettings() {
     if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
-      chrome.storage.local.set({ snapauto_settings: currentSettings });
+      chrome.storage.local.get(['snapauto_settings', 'snapauto_total_opened'], (result) => {
+        const existing = (result && result.snapauto_settings) || {};
+        const existingStats = existing.stats || {};
+        const total = Math.max(
+          Number(result && result.snapauto_total_opened) || 0,
+          Number(existingStats.totalOpened) || 0,
+          Number(currentSettings.stats && currentSettings.stats.totalOpened) || 0
+        );
+        const payload = {
+          ...existing,
+          ...currentSettings,
+          stats: {
+            ...existingStats,
+            ...(currentSettings.stats || {}),
+            totalOpened: total
+          }
+        };
+        chrome.storage.local.set({ snapauto_settings: payload });
+      });
     }
   }
 
